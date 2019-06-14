@@ -17,6 +17,11 @@ config :inflow, InflowWeb.Endpoint,
   render_errors: [view: InflowWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Inflow.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :inflow, Gravity,
+  api_url: System.get_env("GRAVITY_API_URL"),
+  api_token: System.get_env("GRAVITY_API_TOKEN")
+
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
