@@ -1,0 +1,13 @@
+version: 2.1
+
+# see https://circleci.com/blog/contributing-the-elixir-orb/
+orbs:
+  elixir: coletiv/elixir@0.1.0
+
+workflows:
+  elixir-build-test-minimal:
+    jobs:
+      - elixir/build-and-test:
+          check-format: true
+          credo: true
+          elixir-version: 1.8.2
