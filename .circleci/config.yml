@@ -1,15 +1,22 @@
-version: 2.1
-
-# see
-# - https://circleci.com/blog/contributing-the-elixir-orb/
-# - https://circleci.com/orbs/registry/orb/coletiv/elixir
-orbs:
-  elixir: coletiv/elixir@0.1.0
-
-workflows:
-  elixir-build-test-minimal:
-    jobs:
-      - elixir/build-and-test:
-          check-format: true
-          credo: true
-          elixir-version: 1.8.2
+# Elixir CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.8.2
+      - image: circleci/postgres:11.3-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: inflow_test
+          POSTGRES_PASSWORD: postgres
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run: mix ecto.create
+      - run: mix ecto.migrate
+      - run: mix test
