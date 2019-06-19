@@ -1,6 +1,8 @@
 version: 2.1
 
-# see https://circleci.com/blog/contributing-the-elixir-orb/
+# see
+# - https://circleci.com/blog/contributing-the-elixir-orb/
+# - https://circleci.com/orbs/registry/orb/coletiv/elixir
 orbs:
   elixir: coletiv/elixir@0.1.0
 
