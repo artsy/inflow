@@ -17,6 +17,7 @@ defmodule InflowWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    resources("/manifests", ManifestsController, only: [:index, :new, :create, :show])
   end
 
   # Other scopes may use custom stacks.

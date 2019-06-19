@@ -4,6 +4,7 @@ defmodule Inflow.Import do
   """
 
   import Ecto.Query, warn: false
+  alias ExAws.S3
   alias Inflow.Repo
 
   alias Inflow.Import.Manifest
@@ -19,6 +20,26 @@ defmodule Inflow.Import do
   """
   def list_manifests do
     Repo.all(Manifest)
+  end
+
+  @doc """
+  Reutrns new Manifest given a file_path. It will:
+   - store the file on S3
+   - create a new manifest
+  """
+  def start_upload(file_path, file_name, partner_id, is_auction \\ false) do
+    # upload to S3
+    with {:ok, manifest} <- create_manifest(%{partner_id: partner_id, is_auction: is_auction, file_name: file_name}),
+         {:ok, _file_path} <- upload_to_s3(manifest, file_path) do
+      {:ok, manifest}
+    end
+  end
+
+  defp upload_to_s3(manifest, file_path) do
+    file_path
+      |> S3.Upload.stream_file
+      |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
+      |> ExAws.request! #=> :done
   end
 
   @doc """

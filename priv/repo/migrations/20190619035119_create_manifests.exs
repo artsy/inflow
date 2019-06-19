@@ -7,6 +7,8 @@ defmodule Inflow.Repo.Migrations.CreateManifests do
       add :state, :string, default: "pending", null: false
       add :is_auction, :boolean, default: false, null: false
       add :columns, {:array, :string}
+      add :file_name, :string
+      add :file_path, :string
 
       timestamps()
     end

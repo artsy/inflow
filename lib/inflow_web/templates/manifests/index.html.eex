@@ -1,0 +1,3 @@
+<%= for manifest <- @manifests do %>
+  test
+<%  end %>

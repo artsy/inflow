@@ -7,6 +7,8 @@ defmodule Inflow.Import.Manifest do
     field :is_auction, :boolean, default: false
     field :partner_id, :string
     field :state, :string, default: "pending"
+    field :file_name, :string
+    field :file_path, :string
 
     timestamps()
   end
@@ -14,7 +16,7 @@ defmodule Inflow.Import.Manifest do
   @doc false
   def changeset(manifest, attrs) do
     manifest
-    |> cast(attrs, [:partner_id, :is_auction, :state, :columns])
+    |> cast(attrs, [:partner_id, :is_auction, :state, :columns, :file_name, :file_path])
     |> validate_required([:partner_id, :is_auction])
   end
 end
