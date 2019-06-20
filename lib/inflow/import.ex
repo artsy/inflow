@@ -2,6 +2,7 @@ defmodule Inflow.Import do
   @moduledoc """
   The Import context.
   """
+  alias NimbleCSV.RFC4180, as: CSV
 
   import Ecto.Query, warn: false
   alias ExAws.S3
@@ -30,8 +31,11 @@ defmodule Inflow.Import do
   def start_upload(file_path, file_name, partner_id, is_auction \\ false) do
     # upload to S3
     with {:ok, manifest} <- create_manifest(%{partner_id: partner_id, is_auction: is_auction, file_name: file_name}),
-         {:ok, _file_path} <- upload_to_s3(manifest, file_path) do
+         {:ok, _} <- upload_to_s3(manifest, file_path) do
+      spawn(Inflow.Import, :process_csv, [manifest, file_path])
       {:ok, manifest}
+    else
+      error -> IO.inspect(error)
     end
   end
 
@@ -39,7 +43,14 @@ defmodule Inflow.Import do
     file_path
       |> S3.Upload.stream_file
       |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
-      |> ExAws.request! #=> :done
+      |> ExAws.request #=> :done
+  end
+
+  def process_csv(manifest, file_path) do
+    file_path
+    |> File.stream!
+    |> CSV.parse_stream(skip_headers: false)
+    |> Stream.map(&IO.inspect(&1))
   end
 
   @doc """
