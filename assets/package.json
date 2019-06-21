@@ -8,7 +8,8 @@
   "dependencies": {
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
-    "@artsy/palette": "^4.9.4"
+    "@artsy/palette": "^4.9.4",
+    "phoenix_live_view": "file:../deps/phoenix_live_view"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

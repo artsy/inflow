@@ -7,18 +7,25 @@
 # General application configuration
 use Mix.Config
 
+config :phoenix,
+  template_engines: [leex: Phoenix.LiveView.Engine]
+
 config :inflow,
-  ecto_repos: [Inflow.Repo]
+  ecto_repos: [Inflow.Repo],
+  gravity_api: Gravity
 
 # Configures the endpoint
 config :inflow, InflowWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "k3ih10Xby7rsD4h/ObGWX8agOH8BjLSMJevtOx0KZadb/UsE695NQ2Zl6malRLcL",
   render_errors: [view: InflowWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Inflow.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Inflow.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+    signing_salt: System.get_env("SIGNING_SALT")
+  ]
 
 config :inflow, Gravity,
-  api_url: System.get_env("GRAVITY_API_URL"),
+  api_url: System.get_env("GRAVITY_API_URL") || "https://stagingapi.artsy.net",
   api_token: System.get_env("GRAVITY_API_TOKEN")
 
 config :artsy_auth_ex,
