@@ -2,8 +2,6 @@ use Mix.Config
 
 # Configure your database
 config :inflow, Inflow.Repo,
-  username: "postgres",
-  password: "postgres",
   database: "inflow_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
@@ -61,7 +59,8 @@ config :inflow, InflowWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/inflow_web/{live,views}/.*(ex)$",
-      ~r"lib/inflow_web/templates/.*(eex)$"
+      ~r"lib/inflow_web/templates/.*(eex)$",
+      ~r{lib/inflow_web/live/.*(ex)$}
     ]
   ]
 

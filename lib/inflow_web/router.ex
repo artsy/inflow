@@ -7,6 +7,7 @@ defmodule InflowWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Phoenix.LiveView.Flash
   end
 
   pipeline :api do
@@ -20,7 +21,8 @@ defmodule InflowWeb.Router do
   scope "/", InflowWeb do
     pipe_through [:browser, :authenticated]
 
-    get "/", PageController, :index
+    live "/", DashboardView
+
     resources("/manifests", ManifestsController, only: [:index, :new, :create, :show])
   end
 
