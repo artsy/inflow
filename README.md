@@ -2,6 +2,8 @@
 
 An experimental batch imports application written in Elixir/Phoenix
 
+[![CircleCI](https://circleci.com/gh/artsy/inflow.svg?style=svg)](https://circleci.com/gh/artsy/inflow)
+
 ## Why are we doing this?
 
 * A chance to try a real-world Phoenix application for learning
