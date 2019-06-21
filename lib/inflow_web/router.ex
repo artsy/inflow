@@ -13,11 +13,23 @@ defmodule InflowWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug Artsy.Auth.Plug
+  end
+
   scope "/", InflowWeb do
-    pipe_through :browser
+    pipe_through [:browser, :authenticated]
 
     get "/", PageController, :index
     resources("/manifests", ManifestsController, only: [:index, :new, :create, :show])
+  end
+
+  scope "/auth", InflowWeb do
+    pipe_through :browser
+
+    get "/", AuthController, :index
+    get "/callback", AuthController, :callback
+    get "/signout", AuthController, :delete
   end
 
   # Other scopes may use custom stacks.
