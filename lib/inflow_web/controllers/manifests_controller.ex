@@ -2,8 +2,8 @@ defmodule InflowWeb.ManifestsController do
   use InflowWeb, :controller
   alias Inflow.{Import, Import.Manifest}
 
-  def index(conn, _params) do
-    render(conn, "index.html", manifests: Import.list_manifests())
+  def index(conn, %{"partner_id" => partner_id}) do
+    render(conn, "index.html", manifests: Import.list_manifests(), partner_id: partner_id)
   end
 
   @spec show(Plug.Conn.t(), map) :: Plug.Conn.t()
