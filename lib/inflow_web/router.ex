@@ -21,7 +21,7 @@ defmodule InflowWeb.Router do
   scope "/", InflowWeb do
     pipe_through [:browser, :authenticated]
 
-    live "/", DashboardView
+    live "/", DashboardView, session: [:access_token]
 
     resources("/manifests", ManifestsController, only: [:index, :new, :create, :show])
   end

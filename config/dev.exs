@@ -2,6 +2,8 @@ use Mix.Config
 
 # Configure your database
 config :inflow, Inflow.Repo,
+  username: "postgres",
+  password: "postgres",
   database: "inflow_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
