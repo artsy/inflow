@@ -1,3 +1,4 @@
+<%= @partner_id %>
 <%= for manifest <- @manifests do %>
   test
 <%  end %>

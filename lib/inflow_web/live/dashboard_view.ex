@@ -4,13 +4,13 @@ defmodule InflowWeb.DashboardView do
 
   def render(assigns) do
     ~L"""
-    <form phx-change="suggest" phx-submit="search">
+    <form phx-change="suggest" phx-submit="select">
       <input type="text" name="q" value="<%= @query %>" list="matches"
              placeholder="Search..."
              <%= if @loading, do: "readonly" %>/>
       <datalist id="matches">
         <%= for match <- @matches do %>
-          <option value="<%= match["_id"] %>"><%= match["name"] %></option>
+          <option value="<%= match["_id"] %>" phx-click="select<%= match["_id"] %>"> <%= match["name"] %></option>
         <% end %>
       </datalist>
       <%= if @result do %><pre><%= @result %></pre><% end %>
@@ -25,6 +25,13 @@ defmodule InflowWeb.DashboardView do
   def handle_event("suggest", %{"q" => q}, socket) when byte_size(q) <= 100 do
     matches = fetch_partners(q, socket.assigns.access_token)
     {:noreply, assign(socket, matches: matches)}
+  end
+
+  def handle_event("select", %{"q" => q}, socket) do
+    {:stop,
+        socket
+        |> put_flash(:info, "Partner Selected")
+        |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: q}))}
   end
 
   defp fetch_partners(term, token) do
