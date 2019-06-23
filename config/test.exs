@@ -12,7 +12,10 @@ config :inflow, Inflow.Repo,
 # you can enable the server option below.
 config :inflow, InflowWeb.Endpoint,
   http: [port: 4002],
-  server: false
+  server: false,
+  live_view: [
+    signing_salt: "test_signing_salt"
+  ]
 
 # Print only warnings and errors during test
 config :logger, level: :warn

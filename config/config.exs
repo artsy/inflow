@@ -29,14 +29,20 @@ config :inflow, Gravity,
   api_token: System.get_env("GRAVITY_API_TOKEN")
 
 config :artsy_auth_ex,
-  token_aud: System.get_env("ARTSY_TOKEN_AUD"), # aud of your JWT token, Gravity's ClientApplication.id
-  client_id: System.get_env("ARTSY_CLIENT_ID"), # Gravity's ClientApplication.app_id
-  client_secret: System.get_env("ARTSY_CLIENT_SECRET"), # Gravity's ClientApplication.app_secret
-  redirect_uri: Map.get(System.get_env(), "HOST_URL", "http://localhost:4000") <> "/auth/callback",
-  site: System.get_env("ARTSY_URL"), # Gravity's api url ex. https://stagingapi.artsy.net
+  # aud of your JWT token, Gravity's ClientApplication.id
+  token_aud: System.get_env("ARTSY_TOKEN_AUD"),
+  # Gravity's ClientApplication.app_id
+  client_id: System.get_env("ARTSY_CLIENT_ID"),
+  # Gravity's ClientApplication.app_secret
+  client_secret: System.get_env("ARTSY_CLIENT_SECRET"),
+  redirect_uri:
+    Map.get(System.get_env(), "HOST_URL", "http://localhost:4000") <> "/auth/callback",
+  # Gravity's api url ex. https://stagingapi.artsy.net
+  site: System.get_env("ARTSY_URL"),
   authorize_url: "/oauth2/authorize",
   token_url: "/oauth2/access_token",
-  allowed_roles: ["admin"] # list of roles allowed to access your app
+  # list of roles allowed to access your app
+  allowed_roles: ["admin"]
 
 config :joken,
   default_signer: System.get_env("ARTSY_INTERNAL_SECRET")
