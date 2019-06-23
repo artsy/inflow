@@ -29,6 +29,6 @@ defmodule InflowWeb.AuthController do
 
     conn
     |> put_session(:access_token, client.token.access_token)
-    |> redirect(to: "/manifests")
+    |> redirect(to: "/")
   end
 end
