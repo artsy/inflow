@@ -19,7 +19,14 @@ defmodule InflowWeb.DashboardView do
   end
 
   def mount(session, socket) do
-    {:ok, assign(socket, query: nil, result: nil, loading: false, matches: [], access_token: session.access_token)}
+    {:ok,
+     assign(socket,
+       query: nil,
+       result: nil,
+       loading: false,
+       matches: [],
+       access_token: session.access_token
+     )}
   end
 
   def handle_event("suggest", %{"q" => q}, socket) when byte_size(q) <= 100 do
@@ -29,13 +36,13 @@ defmodule InflowWeb.DashboardView do
 
   def handle_event("select", %{"q" => q}, socket) do
     {:stop,
-        socket
-        |> put_flash(:info, "Partner Selected")
-        |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: q}))}
+     socket
+     |> put_flash(:info, "Partner Selected")
+     |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: q}))}
   end
 
   defp fetch_partners(term, token) do
     @gravity_api.get!("/api/v1/match/partners?term=#{term}", [{:"X-ACCESS-TOKEN", token}]).body
-    |> Enum.map( fn partner -> Map.take(partner, ["_id", "name"]) end )
+    |> Enum.map(fn partner -> Map.take(partner, ["_id", "name"]) end)
   end
 end

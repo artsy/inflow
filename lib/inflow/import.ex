@@ -30,7 +30,8 @@ defmodule Inflow.Import do
   """
   def start_upload(file_path, file_name, partner_id, is_auction \\ false) do
     # upload to S3
-    with {:ok, manifest} <- create_manifest(%{partner_id: partner_id, is_auction: is_auction, file_name: file_name}),
+    with {:ok, manifest} <-
+           create_manifest(%{partner_id: partner_id, is_auction: is_auction, file_name: file_name}),
          {:ok, _} <- upload_to_s3(manifest, file_path) do
       spawn(Inflow.Import, :process_csv, [manifest, file_path])
       {:ok, manifest}
@@ -41,14 +42,15 @@ defmodule Inflow.Import do
 
   defp upload_to_s3(manifest, file_path) do
     file_path
-      |> S3.Upload.stream_file
-      |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
-      |> ExAws.request #=> :done
+    |> S3.Upload.stream_file()
+    |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
+    # => :done
+    |> ExAws.request()
   end
 
   def process_csv(manifest, file_path) do
     file_path
-    |> File.stream!
+    |> File.stream!()
     |> CSV.parse_stream(skip_headers: false)
     |> Stream.map(&IO.inspect(&1))
   end

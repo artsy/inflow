@@ -3,7 +3,10 @@ defmodule InflowWeb.ManifestsController do
   alias Inflow.{Import, Import.Manifest}
 
   def index(conn, %{"partner_id" => partner_id}) do
-    render(conn, "index.html", manifests: Import.list_manifests(), partner_id: partner_id)
+    render(conn, "index.html",
+      manifests: Import.list_manifests(),
+      partner_id: partner_id
+    )
   end
 
   @spec show(Plug.Conn.t(), map) :: Plug.Conn.t()
@@ -18,7 +21,13 @@ defmodule InflowWeb.ManifestsController do
   end
 
   def create(conn, %{"manifest" => %{"import_file" => uploaded_file}}) do
-    with {:ok, manifest} <- Import.start_upload(uploaded_file.path, uploaded_file.filename, "510afead4926534fd8000683", false) do
+    with {:ok, manifest} <-
+           Import.start_upload(
+             uploaded_file.path,
+             uploaded_file.filename,
+             "510afead4926534fd8000683",
+             false
+           ) do
       conn
       |> put_flash(:info, "Started Upload Process")
       |> redirect(to: Routes.manifests_path(conn, :show, manifest))
@@ -27,6 +36,6 @@ defmodule InflowWeb.ManifestsController do
         conn
         |> put_flash(:error, "something went wrong")
         |> redirect(to: Routes.manifests_path(conn, :new))
-      end
+    end
   end
 end
