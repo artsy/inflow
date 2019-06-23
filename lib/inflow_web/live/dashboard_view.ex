@@ -6,13 +6,11 @@ defmodule InflowWeb.DashboardView do
     ~L"""
     <form phx-change="suggest" phx-submit="select">
       <input type="text" name="q" value="<%= @query %>" list="matches"
-             placeholder="Search..."
-             <%= if @loading, do: "readonly" %>/>
-      <datalist id="matches">
-        <%= for match <- @matches do %>
-          <option value="<%= match["_id"] %>" phx-click="select<%= match["_id"] %>"> <%= match["name"] %></option>
-        <% end %>
-      </datalist>
+            placeholder="Search..."
+            <%= if @loading, do: "readonly" %>/>
+      <%= for match <- @matches do %>
+        <div phx-click="select<%= match["_id"] %>" class="partnerItem"> <%= match["name"] %> </div>
+      <% end %>
       <%= if @result do %><pre><%= @result %></pre><% end %>
     </form>
     """
@@ -29,16 +27,17 @@ defmodule InflowWeb.DashboardView do
      )}
   end
 
-  def handle_event("suggest", %{"q" => q}, socket) when byte_size(q) <= 100 do
+  def handle_event("suggest", %{"q" => q}, socket) when byte_size(q) >= 3 do
     matches = fetch_partners(q, socket.assigns.access_token)
     {:noreply, assign(socket, matches: matches)}
   end
+  def handle_event("suggest", _ , socket), do: {:noreply, assign(socket, matches: [])}
 
-  def handle_event("select", %{"q" => q}, socket) do
+  def handle_event("select"<> partner_id, _ , socket) do
     {:stop,
      socket
      |> put_flash(:info, "Partner Selected")
-     |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: q}))}
+     |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: partner_id}))}
   end
 
   defp fetch_partners(term, token) do

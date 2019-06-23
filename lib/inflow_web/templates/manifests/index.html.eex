@@ -1,1 +1,6 @@
-<%= @partner_id %>
+<section>
+  <div class="mb-1 serif-3t">Partner Id: <%= @partner["_id"] %></div>
+  <div class="mb-1 serif-3t">Partner Name: <%= @partner["name"] %></div>
+
+  <%= link("New Batch Upload", to: Routes.manifests_path(@conn, :new, partner_id: @partner["_id"])) %>
+</section>

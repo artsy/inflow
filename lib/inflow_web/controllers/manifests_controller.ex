@@ -1,12 +1,13 @@
 defmodule InflowWeb.ManifestsController do
   use InflowWeb, :controller
   alias Inflow.{Import, Import.Manifest}
+  @gravity_api Application.get_env(:inflow, :gravity_api)
 
   def index(conn, %{"partner_id" => partner_id}) do
-    render(conn, "index.html",
-      manifests: Import.list_manifests(),
-      partner_id: partner_id
-    )
+    partner = @gravity_api.get!("/api/v1/partner/#{partner_id}").body
+    conn
+    |> put_session(:partner_id, partner_id)
+    |> render("index.html", manifests: Import.list_manifests(), partner: partner)
   end
 
   @spec show(Plug.Conn.t(), map) :: Plug.Conn.t()
@@ -15,17 +16,17 @@ defmodule InflowWeb.ManifestsController do
   end
 
   @spec new(Plug.Conn.t(), any) :: Plug.Conn.t()
-  def new(conn, _params) do
-    changeset = Import.change_manifest(%Manifest{})
+  def new(conn, %{"partner_id" => partner_id}) do
+    changeset = Import.change_manifest(%Manifest{partner_id: partner_id})
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"manifest" => %{"import_file" => uploaded_file}}) do
+  def create(conn, %{"manifest" => %{"import_file" => uploaded_file, "partner_id" => partner_id}}) do
     with {:ok, manifest} <-
            Import.start_upload(
              uploaded_file.path,
              uploaded_file.filename,
-             "510afead4926534fd8000683",
+             partner_id,
              false
            ) do
       conn
