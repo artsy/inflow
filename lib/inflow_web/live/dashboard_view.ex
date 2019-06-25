@@ -31,13 +31,16 @@ defmodule InflowWeb.DashboardView do
     matches = fetch_partners(q, socket.assigns.access_token)
     {:noreply, assign(socket, matches: matches)}
   end
-  def handle_event("suggest", _ , socket), do: {:noreply, assign(socket, matches: [])}
 
-  def handle_event("select"<> partner_id, _ , socket) do
+  def handle_event("suggest", _, socket), do: {:noreply, assign(socket, matches: [])}
+
+  def handle_event("select" <> partner_id, _, socket) do
     {:stop,
      socket
      |> put_flash(:info, "Partner Selected")
-     |> redirect(to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: partner_id}))}
+     |> redirect(
+       to: InflowWeb.Router.Helpers.manifests_path(socket, :index, %{partner_id: partner_id})
+     )}
   end
 
   defp fetch_partners(term, token) do

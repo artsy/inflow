@@ -1,10 +1,12 @@
 defmodule InflowWeb.ManifestsController do
   use InflowWeb, :controller
+  alias Phoenix.LiveView
   alias Inflow.{Import, Import.Manifest}
   @gravity_api Application.get_env(:inflow, :gravity_api)
 
   def index(conn, %{"partner_id" => partner_id}) do
     partner = @gravity_api.get!("/api/v1/partner/#{partner_id}").body
+
     conn
     |> put_session(:partner_id, partner_id)
     |> render("index.html", manifests: Import.list_manifests(), partner: partner)
@@ -12,7 +14,17 @@ defmodule InflowWeb.ManifestsController do
 
   @spec show(Plug.Conn.t(), map) :: Plug.Conn.t()
   def show(conn, %{"id" => id}) do
-    render(conn, "show.html", manifest: %{id: id})
+    manifest = Import.get_manifest!(id)
+
+    case manifest.state do
+      state when state in ["pending", "processing"] ->
+        LiveView.Controller.live_render(conn, InflowWeb.ManifestLiveView,
+          session: %{manifest_id: id, access_token: Plug.Conn.get_session(conn, :access_token)}
+        )
+
+      _ ->
+        render(conn, "show.html", manifest: manifest)
+    end
   end
 
   @spec new(Plug.Conn.t(), any) :: Plug.Conn.t()
