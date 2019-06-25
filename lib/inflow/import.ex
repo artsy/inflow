@@ -10,6 +10,7 @@ defmodule Inflow.Import do
 
   alias Inflow.Import.Manifest
 
+  @artsy_current_bucket "artsy-currents-development"
   @doc """
   Returns the list of manifests.
 
@@ -33,7 +34,7 @@ defmodule Inflow.Import do
     with {:ok, manifest} <-
            create_manifest(%{partner_id: partner_id, is_auction: is_auction, file_name: file_name}),
          {:ok, _} <- upload_to_s3(manifest, file_path) do
-      spawn(Inflow.Import, :process_csv, [manifest, file_path])
+      spawn(Inflow.Import, :process_csv, [manifest])
       {:ok, manifest}
     else
       error -> IO.inspect(error)
@@ -43,15 +44,25 @@ defmodule Inflow.Import do
   defp upload_to_s3(manifest, file_path) do
     file_path
     |> S3.Upload.stream_file()
-    |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
+    |> S3.upload(@artsy_current_bucket, "#{manifest.partner_id}/#{manifest.id}.csv")
     |> ExAws.request()
   end
 
-  def process_csv(manifest, file_path) do
-    file_path
-    |> File.stream!()
-    |> CSV.parse_stream(skip_headers: false)
-    |> Stream.map(&IO.inspect(&1))
+  def process_csv(manifest) do
+    S3.download_file(@artsy_current_bucket, "#{manifest.partner_id}/#{manifest.id}.csv", "/tmp/#{manifest.id}.csv")
+    |> ExAws.request!
+
+    File.stream!("/tmp/#{manifest.id}.csv")
+    |> CSV.parse_stream(skip_headers: true)
+    |> Enum.map(&Inflow.Import.process_row(&1, manifest))
+
+    :timer.sleep(Enum.random(1..6) * 1000)
+    InflowWeb.Endpoint.broadcast("manifests:#{manifest.id}", "manifest_updated", %{state: "completed"})
+  end
+
+  def process_row(csv_row, manifest) do
+    :timer.sleep(Enum.random(1..6) * 1000)
+    InflowWeb.Endpoint.broadcast("manifests:#{manifest.id}", "manifest_row_created", %{manifest_row: %{name: Enum.fetch!(csv_row, 0), title: Enum.fetch!(csv_row, 1)}})
   end
 
   @doc """
