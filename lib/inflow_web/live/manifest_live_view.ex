@@ -5,7 +5,7 @@ defmodule InflowWeb.ManifestLiveView do
 
   def render(assigns) do
     ~L"""
-    <% if @loading do %>
+    <%= if @loading do %>
       <div> Loading </div>
     <% else %>
       <div> <%= @manifest.state %> </div>
@@ -15,7 +15,6 @@ defmodule InflowWeb.ManifestLiveView do
 
   def mount(session, socket) do
     manifest_id = session.manifest_id
-    IO.inspect(manifest_id)
     if connected?(socket) do
       InflowWeb.Endpoint.subscribe(@topic <> manifest_id)
       send(self(), :initialize)
@@ -31,14 +30,14 @@ defmodule InflowWeb.ManifestLiveView do
 
   def handle_info(:initialize, socket) do
     manifest = Inflow.Import.get_manifest!(socket.assigns.id)
-    IO.inspect(manifest, label: "---->")
     {:noreply, assign(socket, manifest: manifest, loading: false)}
   end
 
-  def handle_info(%{event: @topic <> routing_key, payload: %{state: state}}, socket) do
+  def handle_info(%{event: "manifest_updated", payload: %{state: state}}, socket) do
     {:noreply, assign(socket, manifest: %Manifest{socket.assigns.manifest | state: state})}
   end
-  def handle_info(%{event: @topic <> routing_key, payload: %{manifest_row_id: manifest_row_id, state: state}}, socket) do
+
+  def handle_info(%{event: "manifest_row_updated", payload: %{manifest_row_id: manifest_row_id, state: state}}, socket) do
     {:noreply, assign(socket, manifest: %Manifest{socket.assigns.manifest | state: state})}
   end
 end
