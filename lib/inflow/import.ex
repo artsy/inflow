@@ -44,7 +44,6 @@ defmodule Inflow.Import do
     file_path
     |> S3.Upload.stream_file()
     |> S3.upload("artsy-currents-development", "#{manifest.partner_id}/#{manifest.id}.csv")
-    # => :done
     |> ExAws.request()
   end
 
