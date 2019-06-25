@@ -8,7 +8,15 @@ defmodule InflowWeb.ManifestLiveView do
     <%= if @loading do %>
       <div> Loading </div>
     <% else %>
-      <div> <%= @manifest.state %> </div>
+      <div><strong> <%= @manifest.state %> </strong></div>
+      <table class="manifest-row-section">
+        <%= for mr <- @manifest_rows do %>
+          <tr class="manifest-row">
+            <td> <%= mr.name %></td>
+            <td> <%= mr.title %></td>
+          </tr>
+        <% end %>
+      </table>
     <% end %>
     """
   end
@@ -24,6 +32,7 @@ defmodule InflowWeb.ManifestLiveView do
        id: manifest_id,
        manifest: nil,
        loading: true,
+       manifest_rows: [],
        access_token: session.access_token
      )}
   end
@@ -37,7 +46,7 @@ defmodule InflowWeb.ManifestLiveView do
     {:noreply, assign(socket, manifest: %Manifest{socket.assigns.manifest | state: state})}
   end
 
-  def handle_info(%{event: "manifest_row_updated", payload: %{manifest_row_id: manifest_row_id, state: state}}, socket) do
-    {:noreply, assign(socket, manifest: %Manifest{socket.assigns.manifest | state: state})}
+  def handle_info(%{event: "manifest_row_created", payload: %{manifest_row: manifest_row}}, socket) do
+    {:noreply, assign(socket, manifest_rows: socket.assigns.manifest_rows ++ [manifest_row])}
   end
 end
