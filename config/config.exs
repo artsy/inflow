@@ -22,7 +22,8 @@ config :inflow, InflowWeb.Endpoint,
   pubsub: [name: Inflow.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [
     signing_salt: System.get_env("SIGNING_SALT")
-  ]
+  ],
+  check_origin: false
 
 config :inflow, Gravity,
   api_url: System.get_env("GRAVITY_API_URL") || "https://stagingapi.artsy.net",
